@@ -85,3 +85,75 @@ const InquirerPrompt = () => {
             }
         });
 };
+
+// Departments infomation
+showDepartments = () => {
+    console.log('All departments are showing.');
+    const mysql = `SELECT department.id AS id, department.name AS department FROM department`;
+
+    connection.query(mysql, (err, rows) => {
+        if (err) return console.log(err);
+        console.table(rows);
+        InquirerPrompt();
+    });
+}
+
+// Show roles
+showRoles = () => {
+    console.log('Show all roles.');
+
+    const mysql = `SELECT roles.id, roles.title, department.name AS department FROM roles LEFT JOIN department ON roles.department_id = department.id`;
+
+    connection.query(mysql, (err, rows) => {
+        console.table(rows);
+        InquirerPrompt();
+    })
+};
+
+// Add roles infomation
+addRoles = () => {
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'roles',
+            message: "What do you want to add?",
+
+        },
+        {
+            type: 'input',
+            name: 'salary',
+            message: 'What is your yearly salary?',
+        }
+
+    ])
+        .then(answer => {
+            const parameters = [answer.roles, answer.salary];
+            const roles_var = `SELECT name, id FROM department`;
+
+            connection.query(roles_var, (err, data) => {
+                if (err) return console.log(err);
+                const department_var = data.map(({ name, id }) => ({ name: name, value: id }));
+
+                inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'department_var',
+                        message: "What department is this role in?",
+                        choices: department_var
+                    }
+                ])
+                    .then(department_varChoice => {
+                        const department_var = department_varChoice.department_var;
+                        parameters.push(department_var);
+                        const mysql = `INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)`;
+
+                        connection.query(mysql, parameters, (err, result) => {
+                            if (err) return console.log(err);
+                            console.log('Added' + answer.roles + "to roles");
+                            showRoles();
+                        });
+                    });
+            });
+        });
+};
+
