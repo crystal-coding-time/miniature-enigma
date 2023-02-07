@@ -13,8 +13,8 @@ const connection = mysql.createConnection(
     {
         host: 'localhost',
         user: 'root',
-        password: 'W@lker!',
-        database: 'tracker_db'
+        password: 'password',
+        database: 'employees_db'
     });
 
 // connects to the mysql database
