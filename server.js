@@ -280,26 +280,30 @@ addEmployees = ()  => {
                 showEmployees();
 
            })
-        })
-    })
+        });
+    });
+};
+
+function findEmployees() {
+    return connection.promise().query(`SELECT * FROM employee`);
 }
 
 // Function to update an employee 
 updateEmployee = () => {
 // get employees from employee table 
-const employeeSQL = `SELECT * FROM employee`;
-
-connection.promise().query(employeeSQL, (err, data) => {
-    if (err) throw err; 
-
-const employees = data.map(({ id, first_name, last_name }) => ({ name: first_name + " "+ last_name, value: id }));
+findEmployees().then(([rows]) => {
+    let employees = rows;
+    const employeeChoices = employees.map(({id, first_name, last_name}) => ({
+        name: `${first_name} ${last_name}`,
+        value: id,
+    }));
 
     inquirer.prompt([
     {
         type: 'list',
         name: 'name',
         message: "Which employee would you like to update?",
-        choices: employees
+        choices: employeeChoices,
     }
     ])
     .then(empChoice => {
@@ -312,7 +316,10 @@ const employees = data.map(({ id, first_name, last_name }) => ({ name: first_nam
         connection.promise().query(roleSql, (err, data) => {
         if (err) throw err; 
 
-        const roles = data.map(({ id, title }) => ({ name: title, value: id }));
+        const roles = data.map(({ id, title }) => ({ 
+            name: title, 
+            value: id 
+        }));
         
             inquirer.prompt([
             {
@@ -320,16 +327,16 @@ const employees = data.map(({ id, first_name, last_name }) => ({ name: first_nam
                 name: 'role',
                 message: "What is the employee's new role?",
                 choices: roles
-            }
+            },
             ])
-                .then(roleChoice => {
-                const role = roleChoice.role;
-                parameters.push(role); 
-                
-                let employee = parameters[0]
-                parameters[0] = role
-                parameters[1] = employee 
-                
+            .then(roleChoice => {
+            const role = roleChoice.role;
+            parameters.push(role); 
+            
+            let employee = parameters[0]
+            parameters[0] = role
+            parameters[1] = employee 
+            
 
                 // console.log(parameters)
 
