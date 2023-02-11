@@ -38,7 +38,7 @@ const InquirerPrompt = () => {
                 'Add department',
                 'Add role',
                 'Add employee',
-                'Update all departments',
+                'Delete an employee',
                 'Update employee infomation',
                 'Exit'
             ]
@@ -76,8 +76,8 @@ const InquirerPrompt = () => {
                 allDepartments();
             }
 
-            if (choices === "Update employee infomation") {
-                updateEmployee();
+            if (choices === "Delete an employee") {
+                deleteEmployee();
             }
 
             if (choices === "Exit") {
@@ -311,9 +311,9 @@ findEmployees().then(([rows]) => {
         const parameters = []; 
         parameters.push(employee);
 
-        const roleSql = `SELECT * FROM role`;
+        const roleSql = `SELECT * FROM roles`;
 
-        connection.promise().query(roleSql, (err, data) => {
+        connection.query(roleSql, (err, data) => {
         if (err) throw err; 
 
         const roles = data.map(({ id, title }) => ({ 
@@ -351,5 +351,38 @@ findEmployees().then(([rows]) => {
         });
     });
     });
+});
+};
+
+// Function to delete employees
+deleteEmployee = () => {
+// Get employees from employee table 
+const employeeSql = `SELECT * FROM employee`;
+
+connection.promise().query(employeeSql, (err, data) => {
+    if (err) throw err; 
+
+const employees = data.map(({ id, first_name, last_name }) => ({ name: first_name + " "+ last_name, value: id }));
+
+    inquirer.prompt([
+    {
+        type: 'list',
+        name: 'name',
+        message: "Which employee would you like to delete?",
+        choices: employees
+    }
+    ])
+    .then(empChoice => {
+        const employee = empChoice.name;
+
+        const sql = `DELETE FROM employee WHERE id = ?`;
+
+        connection.query(sql, employee, (err, result) => {
+        if (err) throw err;
+        console.log("Successfully Deleted!");
+        
+        showEmployees();
+    });
+});
 });
 };
