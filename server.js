@@ -273,18 +273,20 @@ addEmployees = ()  => {
                     choices: roles
                 }
             ])
+            // Work below on role_id and manager_id - we have debugged role but need to work on manager
             .then(rolesChoice => {
-                const role = rolesChoice.roles;
-                parameters.push(rolesChoice);
-                const mysql = `INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)`;
+                const role = rolesChoice.role;
+                console.log(role);
+                parameters.push(role);
+                const mysql = `INSERT INTO employee (first_name, last_name, role_id) VALUES (?,?,?)`; //Work on adding manager_id
 
                 connection.query(mysql, parameters, (err, result) => {
                     if (err) return console.log(err);
-                    console.log('Added' + rolesChoice.roles + "to emlyees");
+                    console.log('Added' + rolesChoice.roles + "to emplyees");
                     showRoles();
                 });
 
-                showEmployees();
+                showEmployees(); //This is not working at this point and needs to be debugged
 
            });
         });
