@@ -275,11 +275,18 @@ addEmployees = ()  => {
             ])
             .then(rolesChoice => {
                 const role = rolesChoice.roles;
-                parameters.push(roles);
+                parameters.push(rolesChoice);
+                const mysql = `INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)`;
+
+                connection.query(mysql, parameters, (err, result) => {
+                    if (err) return console.log(err);
+                    console.log('Added' + rolesChoice.roles + "to emlyees");
+                    showRoles();
+                });
 
                 showEmployees();
 
-           })
+           });
         });
     });
 };
