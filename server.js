@@ -291,6 +291,7 @@ function findEmployees() {
 // Function to update an employee 
 updateEmployee = () => {
 // get employees from employee table 
+
 findEmployees().then(([rows]) => {
     let employees = rows;
     const employeeChoices = employees.map(({id, first_name, last_name}) => ({
@@ -338,15 +339,15 @@ findEmployees().then(([rows]) => {
             parameters[1] = employee 
             
 
-                // console.log(parameters)
+            // console.log(parameters)
 
-                const sql = `UPDATE employee SET role_id = ? WHERE id = ?`;
+            const sql = `UPDATE employee SET role_id = ? WHERE id = ?`;
 
-                connection.query(sql, parameters, (err, result) => {
-                if (err) throw err;
-                console.log("Employee has been updated!");
-            
-                showEmployees();
+            connection.query(sql, parameters, (err, result) => {
+            if (err) throw err;
+            console.log("Employee has been updated!");
+        
+            showEmployees();
         });
         });
     });
@@ -357,27 +358,28 @@ findEmployees().then(([rows]) => {
 // Function to delete employees
 deleteEmployee = () => {
 // Get employees from employee table 
-const employeeSql = `SELECT * FROM employee`;
 
-connection.promise().query(employeeSql, (err, data) => {
-    if (err) throw err; 
-
-const employees = data.map(({ id, first_name, last_name }) => ({ name: first_name + " "+ last_name, value: id }));
+findEmployees().then(([rows]) => {
+    let employees = rows;
+    const employeeChoices = employees.map(({id, first_name, last_name}) => ({
+        name: `${first_name} ${last_name}`,
+        value: id,
+    }));
 
     inquirer.prompt([
     {
         type: 'list',
         name: 'name',
         message: "Which employee would you like to delete?",
-        choices: employees
+        choices: employeeChoices,
     }
     ])
     .then(empChoice => {
         const employee = empChoice.name;
 
-        const sql = `DELETE FROM employee WHERE id = ?`;
+        const roleSql = `DELETE FROM employee WHERE id = ?`;
 
-        connection.query(sql, employee, (err, result) => {
+        connection.query(roleSql, employee, (err, result) => {
         if (err) throw err;
         console.log("Successfully Deleted!");
         
